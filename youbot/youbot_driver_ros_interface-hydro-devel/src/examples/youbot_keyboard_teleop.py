@@ -28,14 +28,16 @@ CTRL-C to quit
 
 moveBindings = {
 #		     x,y,tetha ratio
-		'i':(1,0,0), 	# forwards
-		'o':(1,0,-1), 	# forwards + rotation right
+		'i':(-1,0,0), 	# forwards
+		'o':(-1,0,-1), 	# forwards + rotation left
 		'j':(0,1,0), 	# left
 		'l':(0,-1,0),	# right
-		'u':(1,0,1), 	# forwards + rotation left
-		',':(-1,0,0), 	# backward
-		'.':(0,0,-1), 	# turn right on spot
-		'm':(0,0,1), 	# turn left on spot
+		'u':(-1,0,1), 	# forwards + rotation right
+		',':(1,0,0), 	# backwards
+		'.':(1,0,-1), 	# backwards + rotation left
+		'm':(1,0,1), 	# backwards + rotation right
+		'r':(0,0,1), 	# turn left on spot
+		'f':(0,0,-1), 	# turn right on spot
 	       }
 
 speedBindings={
@@ -132,5 +134,4 @@ if __name__=="__main__":
 		pub.publish(twist)
 
     		termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
-
 
