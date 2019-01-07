@@ -13,7 +13,6 @@ from tf import transformations
 from std_msgs.msg import String
 
 def move_group_python_interface():
-  IK=True
   print "============ Starting tutorial setup"
   moveit_commander.roscpp_initialize(sys.argv)
   ## Initialize the node for this script
@@ -74,45 +73,30 @@ def move_group_python_interface():
   ## end-effector
   print "============ Generating plan 1"
 
-  if IK:
-	  ## pose
-	  pose=geometry_msgs.msg.Pose()
-	  pose.position.x = 0.555
-	  pose.position.y = 0.0066
-	  pose.position.z = -0.10
+  ## pose
+  pose=geometry_msgs.msg.Pose()
+  pose.position.x = 0.510
+  pose.position.y = 0.0006
+  pose.position.z = 0.046
+	  
+  #q = transformations.quaternion_from_euler(pi/2, pi/2, 0, "sxyz")
 
-	  xyz= [pose.position.x,
-		pose.position.y,
-		pose.position.z]
+  ## orientation
+  pose.orientation.x=0.0005
+  pose.orientation.y=0.7136
+  pose.orientation.z=0.0187
+  pose.orientation.w=0.7001
 
-	  #q = transformations.quaternion_from_euler(pi/2, pi/2, 0, "sxyz")
-	  #print q
+  ## set pose
+  group.set_pose_target(pose, eef_link)
+  ## set pose goal tolerance 
+  group.set_goal_tolerance(0.01)
 
-	  ## orientation
-	  pose.orientation.x=0.0005
-	  pose.orientation.y=0.7136
-	  pose.orientation.z=0.0187
-	  pose.orientation.w=0.7001
-
-	  ## set pose
-	  group.set_pose_target(pose, eef_link)
-	  ## set pose goal tolerance 
-	  group.set_goal_tolerance(0.1)
-
-	  ## Now, we call the planner to compute the plan
-	  ## and visualize it if successful
-	  ## Note that we are just planning, not asking move_group 
-	  ## to actually move the robot
-	  group.go(wait=True)
-  else:
-	  group_variable_values=group.get_current_joint_values()
-	  group_variable_values[0]=2.956
-	  group_variable_values[1]=2.70262
-	  group_variable_values[2]=-2.20235
-	  group_variable_values[3]=2.65788
-	  group_variable_values[4]=2.90741
-	  print "\nJoint Values:", group_variable_values
-	  group.go(group_variable_values, wait=True)
+  ## Now, we call the planner to compute the plan
+  ## and visualize it if successful
+  ## Note that we are just planning, not asking move_group 
+  ## to actually move the robot
+  group.go(wait=True)
 
   group.stop()
 
@@ -148,5 +132,4 @@ if __name__=='__main__':
     move_group_python_interface()
   except rospy.ROSInterruptException:
     pass
-
 
