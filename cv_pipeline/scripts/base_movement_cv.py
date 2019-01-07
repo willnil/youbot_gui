@@ -20,6 +20,7 @@ class base_movement:
 	self.info_sub = rospy.Subscriber("/cv_camera/camera_info", CameraInfo, self.info_callback)
 	#publisher
 	self.image_pub = rospy.Publisher('/base_movement/image',Image,queue_size=1)
+	self.distance_pub = rospy.Publisher('/base_movement/distance',FloatList,queue_size=1)
 	self.camera_model = None
 	self.rate = rospy.Rate(20) #go through the loop 1 time every second
 	self.realpts = deque(maxlen=64)
@@ -90,14 +91,17 @@ class base_movement:
 			# ensure there is significant movement in the x-direction
 			if np.abs(self.dX) > 20: # more than 20 pixel btw x-Coordinates
 				self.rdX = self.realpts[-10][0] - self.realpts[i][0]
-				rospy.loginfo(self.rdX)
 				dirX = "Right" if np.sign(self.dX) == 1 else "Left"
+			else:
+				self.rdX=0
  
 			# ensure there is significant movement in the y-direction
 			if np.abs(self.dY) > 20:
 				self.rdY = self.realpts[-10][1] - self.realpts[i][1]
-				#rospy.loginfo(self.rdY)
 				dirY = "Up" if np.sign(self.dY) == 1 else "Down"
+
+			else:
+				self.rdY=0
  
 			# handle when both directions are non-empty
 			if dirX != "" and dirY != "":
@@ -111,7 +115,9 @@ class base_movement:
 		cv2.line(frame, self.pts[i - 1], self.pts[i], (0, 0, 255), thickness)
 
 	cv2.putText(frame, self.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX,0.65, (0, 0, 255), 3)
-	cv2.putText(frame, "dx: {}, dy: {}".format(self.dX, self.dY), (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
+	cv2.putText(frame, "rdx: {}, rdy: {}".format(self.rdX, self.rdY), (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
+	rospy.loginfo("rdx: {}, rdy: {}".format(self.rdX, self.rdY))
+	self.distance_pub.publish((self.rdX, self.rdY))
 	
 	self.counter += 1
 	cv2.waitKey(1)
@@ -127,4 +133,3 @@ if __name__ == '__main__':
 	while not rospy.is_shutdown():
         	basemovement = base_movement()
         	rospy.spin()
-
