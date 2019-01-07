@@ -1,12 +1,25 @@
 #!/usr/bin/env python
 import rospy
-
+import sys
 from geometry_msgs.msg import Twist
+from cv_pipeline.msg import FloatList
+
+class move_base:
+
+  def __init__(self):
+	#subsriber
+	distance_ist_sub = rospy.Subscriber('/base_movement/distance', FloatList, self.distanceist_callback) #distance_IST
+	distance_soll_sub = rospy.Subscriber('', FloatList, self.distancesoll_callback) #distance_SOLL
+	#publisher
+	pub = rospy.Publisher('cmd_vel', Twist)
 
 if __name__=="__main__":
-	sub = rospy.Subscriber('', Float32)
-	pub = rospy.Publisher('cmd_vel', Twist)
-	rospy.init_node('move_base')
+	rospy.init_node('move_base', anonymous=True)
+	while not rospy.is_shutdown():
+        	move_base = move_base()
+        	rospy.spin()
+
+
 
 	x = 0
 	y = 0
