@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+	<!-- Capture image frames from camera and publish -->	
+	<node pkg="cv_camera" type="cv_camera_node" name="cv_camera" output="screen">
+		<param name="device_id" value="0"/>
+		<param name="rate" value="30"/>
+	</node>
+	
+	<!-- Open Rviz to see results -->
+	<!--<node pkg="rviz" type="rviz" name="rviz" output="screen"/> -->
+	
+	<!-- Run canny edge detection on image frames -->
+	<node pkg="cv_pipeline" type="canny_edge_detector.py" name="canny_edge_detector"/>
+
+	<!-- Open rqt to see results -->
+	<node pkg="rqt_image_view" type="rqt_image_view" name="rqt_image_view" output="screen">
+		<param name="image" value="/cv_camera/image_raw" />
+	</node>
+
+</launch>
