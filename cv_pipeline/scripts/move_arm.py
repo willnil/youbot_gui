@@ -11,6 +11,13 @@ import moveit_msgs.msg
 import geometry_msgs.msg
 from tf import transformations
 from std_msgs.msg import String
+from cv_pipeline.msg import FloatList
+
+# distance transformations from 3D pen printing head to youbot eef link
+df = [-0.0445, 0, 0.147]
+
+# default origin of printing space 
+origin = [0.5545, 0, -0.101] # odom frame
 
 def move_group_python_interface():
   print "============ Starting tutorial setup"
@@ -41,26 +48,12 @@ def move_group_python_interface():
   ## Wait for RVIZ to initialize. This sleep is ONLY to allow Rviz to come up.
   print "============ Waiting for RVIZ..."
   rospy.sleep(10)
-  print "============ Starting tutorial "
+  print "============ Starting... "
 
-  ## Getting Basic Information
-  ## ^^^^^^^^^^^^^^^^^^^^^^^^^
-  ##
-
-  # We can get the name of the reference frame for this robot:
-  planning_frame = group.get_planning_frame()
-  print "============ Reference frame: %s" % planning_frame
-
-  # We can also print the name of the end-effector link for this group:
   eef_link = group.get_end_effector_link()
-  print "============ End effector: %s" % eef_link
-
-  ## We can get a list of all the groups in the robot
-  print "============ Robot Groups:"
-  print robot.get_group_names()
 
   # Start the arm in the work pose stored in the SRDF file
-  group.set_named_target("folded")
+  group.set_named_target("ready_3")
   group.go()
   rospy.sleep(2)
 
@@ -68,33 +61,32 @@ def move_group_python_interface():
   print group.get_current_pose()
   print "============"
   ## Planning to a Pose goal
-  ## ^^^^^^^^^^^^^^^^^^^^^^^
   ## We can plan a motion for this group to a desired pose for the 
   ## end-effector
-  print "============ Generating plan 1"
+  print "============ Generating plans"
 
   ## pose
   pose=geometry_msgs.msg.Pose()
-  pose.position.x = 0.510
-  pose.position.y = 0.0006
-  pose.position.z = 0.046
+  pose.position.x = origin[0] + df[0]
+  pose.position.y = origin[1] + df[1]
+  pose.position.z = origin[2] + df[2]
 	  
-  #q = transformations.quaternion_from_euler(pi/2, pi/2, 0, "sxyz")
+  q = transformations.quaternion_from_euler(0, pi/2, 0, "sxyz")
 
   ## orientation
-  pose.orientation.x=0.0005
-  pose.orientation.y=0.7136
-  pose.orientation.z=0.0187
-  pose.orientation.w=0.7001
+  pose.orientation.x = q[0]
+  pose.orientation.y = q[1]
+  pose.orientation.z = q[2]
+  pose.orientation.w = q[3]
 
   ## set pose
   group.set_pose_target(pose, eef_link)
-  ## set pose goal tolerance 
+  ## set pose goal tolerance
   group.set_goal_tolerance(0.01)
 
   ## Now, we call the planner to compute the plan
   ## and visualize it if successful
-  ## Note that we are just planning, not asking move_group 
+  ## asking move_group 
   ## to actually move the robot
   group.go(wait=True)
 
@@ -102,27 +94,13 @@ def move_group_python_interface():
 
   group.clear_pose_targets()
 
-  print "============ Waiting while RVIZ displays plan1..."
+  print "============ Waiting while RVIZ displays plan..."
   rospy.sleep(5)
-
- 
-  ## You can ask RVIZ to visualize a plan (aka trajectory) for you.  But the
-  ## group.plan() method does this automatically so this is not that useful
-  ## here (it just displays the same trajectory again).
-  ##print "============ Visualizing plan1"
-  ##display_trajectory = moveit_msgs.msg.DisplayTrajectory()
-
-  ##display_trajectory.trajectory_start = robot.get_current_state()
-  ##display_trajectory.trajectory.append(plan1)
-  ##display_trajectory_publisher.publish(display_trajectory);
-
-  ##print "============ Waiting while plan1 is visualized (again)..."
-  ##rospy.sleep(5)
 
   ## When finished shut down moveit_commander.
   moveit_commander.roscpp_shutdown()
 
-  ## END_TUTORIAL
+  ## END
 
   print "============ STOPPING"
 
