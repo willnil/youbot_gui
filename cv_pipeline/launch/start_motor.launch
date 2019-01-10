@@ -7,7 +7,4 @@
             <param name="baud" value="57600" />
     	</node>
 
-	<!-- Run Publisher to toggle_motor topic -->
-	<node name="arduino_motor" pkg="rostopic" type="rostopic" args="pub toggle_motor std_msgs/Empty --once" output="screen"/>
-
 </launch>
