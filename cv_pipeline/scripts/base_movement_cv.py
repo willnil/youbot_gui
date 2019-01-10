@@ -38,7 +38,7 @@ class base_movement:
         self.camera_model.fromCameraInfo(data)
 	self.info_sub.unregister() #Only subscribe once
 
-  def image_callback(self,msg):
+  def image_callback(self, msg):
 	#convert ros message to opencv format	
 	try:	
 	  cv_image = self.bridge.imgmsg_to_cv2(msg,desired_encoding=msg.encoding)
@@ -117,7 +117,8 @@ class base_movement:
 	cv2.putText(frame, self.direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX,0.65, (0, 0, 255), 3)
 	cv2.putText(frame, "rdx: {}, rdy: {}".format(self.rdX, self.rdY), (10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
 	rospy.loginfo("rdx: {}, rdy: {}".format(self.rdX, self.rdY))
-	self.distance_pub.publish((self.rdX, self.rdY))
+	if (self.rdX != 0) or (self.rdY != 0):
+		self.distance_pub.publish((self.rdX, self.rdY))
 	
 	self.counter += 1
 	cv2.waitKey(1)
