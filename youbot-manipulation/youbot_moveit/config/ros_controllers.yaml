@@ -15,8 +15,6 @@ youbot:
       - arm_joint_3
       - arm_joint_4
       - arm_joint_5
-      - gripper_finger_joint_l
-      - gripper_finger_joint_r
       - caster_joint_bl
       - wheel_joint_bl
       - caster_joint_br
