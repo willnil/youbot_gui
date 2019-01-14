@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import rospy
 import sys
-import message_filters
+#import message_filters
 import roslib; roslib.load_manifest('cv_pipeline')
 from geometry_msgs.msg import Twist
 from cv_pipeline.msg import FloatList
@@ -24,24 +24,24 @@ class MoveBase:
 
 	def distancesoll_callback(self, data):
 		rospy.loginfo("SOLL: {}".format(data.elements))
-		ds = data.elements
-		self.movebase()
+		ds = data.elements # [mm]
+		self.movebase(ds)
 
 	def distanceist_callback(self, data):
 		#rospy.wait_for_message('/movement/base_value', FloatList)
 		rospy.loginfo("IST: {}".format(data.elements))
-		di = data.elements
-		if data.elements != (0, 0):
-			self.di_list.appendleft(di)
+		#di = data.elements
+		#if data.elements != (0, 0):
+		#	self.di_list.appendleft(di)
 		#self.movebase()
 		self.counter += 1
 
-	def movebase(self, ds, di):
-		rospy.loginfo("soll: {}, ist: {}".format(ds, di))
+	def movebase(self, ds):
+		rospy.loginfo("soll: {}, ist: {}".format(ds, 0))
 		twist = Twist()
 		# linear speed
-		twist.linear.x = -0.1
-		twist.linear.y = 0
+		twist.linear.x = -0.01*ds[1] # [m/s]
+		twist.linear.y = -0.01*ds[0] # [m/s]
 		twist.linear.z = 0
 		# angular speed
 		twist.angular.x = 0 
@@ -49,9 +49,9 @@ class MoveBase:
 		twist.angular.z = 0
 		for i in range(10):
 			self.base_pub.publish(twist)
-			rospy.sleep(0.1)
+			rospy.sleep(0.01) # 10*0.01 = 0.1 move for 0.1 second
 		
-		twist = Twist()
+		twist = Twist() # stop moving
 		self.base_pub.publish(twist)
 	
 	def cleanup(self):
