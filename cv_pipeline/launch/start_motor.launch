@@ -7,4 +7,7 @@
             <param name="baud" value="57600" />
     	</node>
 
+	<!-- Pub message to OFF the motor at start -->
+	<node pkg="rostopic" type="rostopic" name="start_motor" args="pub /toggle_motor std_msgs/Empty --once" output="screen"/>
+
 </launch>
