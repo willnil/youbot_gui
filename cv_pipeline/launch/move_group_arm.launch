@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+
+  <include file="$(find youbot_moveit)/launch/move_group.launch"/>
+
+  <node name="move_group_python_interface" pkg="cv_pipeline" type="move_arm.py" respawn="false" output="screen">
+  </node>
+
+</launch>
