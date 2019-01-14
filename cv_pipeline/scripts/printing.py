@@ -10,15 +10,15 @@ from std_msgs.msg import Empty
 rospy.init_node('pub_values')
 
 # Create Publishers
-arm_pub = rospy.Publisher('movement/arm_value', FloatList, queue_size=100)
-base_pub = rospy.Publisher('movement/base_value', FloatList, queue_size=100)
-motor_pub = rospy.Publisher('toggle_motor', Empty)
+arm_pub = rospy.Publisher('movement/arm_value', FloatList, queue_size=1)
+base_pub = rospy.Publisher('movement/base_value', FloatList, queue_size=1)
+motor_pub = rospy.Publisher('toggle_motor', Empty, queue_size=1)
 
 # Create a rate
-rate = rospy.Rate(1) # 1 message per second
+rate = rospy.Rate(0.25) # 1 message per 4 second
 
 # Printing space limit [mm]
-lim = [(-50, 50), (-125, 125), (0, 394)] 
+lim = [(0, 0), (-50, 50), (0, 394)]
 
 # To be printed pose
 filename = 'values.txt'
@@ -42,9 +42,10 @@ i = 0
 # Run code in a loop until node is shutdown
 while not rospy.is_shutdown():
 	while i < len(values):
-		movebase_values = []
-    		if movebasetoggle == 1:
+		if movebasetoggle == 1 and movebase_values[1] != 0:
 			i -= 1
+		print "Number of pose: {}".format(i)
+		movebase_values = []
 		if movebasecounter > 0: 
 			values[i] = tuple(map(lambda x, y: x - y, values[i], offset))
 		for j in range(3):
@@ -57,20 +58,20 @@ while not rospy.is_shutdown():
 			else:
 				movebase = 0
 			movebase_values.append(movebase)
+		if i == 2:
+			motor_pub.publish(Empty()) # 3D Pen Motor ON 
+			print "------------3D Pen is switched ON-------------"
 		if (movebase_values == [0,0,0]):
-      			print "------------Moving arms--------------"
-			if movebasetoggle == 1:
-				motor_pub.publish(Empty()) # 3D Pen Motor ON
+		      	print "------------Moving arms to the input pose--------------"
 			arm_pub.publish(values[i])   # publish
-      			movebasetoggle = 0
-      			print "------------Arm moved to the input pose----------------------"
+		      	movebasetoggle = 0
 		else:
-			movebasecounter += 1
-			print "------------Moving base--------------"
-			motor_pub.publish(Empty()) #3D Pen Motor OFF
-      			base_pub.publish(tuple((movebase_values[0], movebase_values[1])))   # publish
-      			offset = tuple(map(lambda x, y: x + y, offset, movebase_values))
-			print offset
-      			print "------------Base moved to a new position---------------------"
+			movebasecounter = 1
+			print "------------Moving base to the new position--------------"
+		      	base_pub.publish(tuple((movebase_values[0], movebase_values[1])))   # publish
+		      	offset = tuple(map(lambda x, y: x + y, offset, movebase_values))
 		i += 1
+		if i == len(values)+1:
+			motor_pub.publish(Empty()) # 3D Pen Motor OFF
+			print "------------3D Pen OFF-------------"
 		rate.sleep()
