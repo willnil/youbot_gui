@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+
+  <node name="move_base" pkg="cv_pipeline" type="move_base.py" respawn="false" output="screen">
+  </node>
+
+</launch>
