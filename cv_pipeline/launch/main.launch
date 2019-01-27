@@ -5,8 +5,6 @@
   <include file="$(find cv_pipeline)/launch/start_motor.launch"/>
   <include file="$(find cv_pipeline)/launch/publish_values.launch"/>
   <include file="$(find cv_pipeline)/launch/move_group_arm.launch"/>
-
-  <node name="move_base" pkg="cv_pipeline" type="move_base.py" respawn="false" output="screen">
-  </node>
+  <include file="$(find cv_pipeline)/launch/move_base.launch"/>
 
 </launch>
