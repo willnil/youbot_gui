@@ -3,7 +3,7 @@ System requirements:
 - ROS Kinetic
 - Ubuntu 16.04 LTS
 - MoveIt!
-- 
+- OpenCV
 
 Installation:
 
